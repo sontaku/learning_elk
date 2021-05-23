@@ -6,13 +6,19 @@
 
   https://adoptopenjdk.net/releases.html
 
-- 버전 보류 *elasticsearch : 7.12.1*
+- elasticsearch : 7.12.1
 
   *https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch/7.12.1*
   
   *https://mvnrepository.com/artifact/org.elasticsearch.client/elasticsearch-rest-high-level-client/7.12.1*
   
 - spring-boot : 2.4.5
+
+- gradle : 6.3
+
+  ```
+  ./gradlew wrapper --gradle-version 6.3
+  ```
 
 
 

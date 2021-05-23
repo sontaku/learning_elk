@@ -72,3 +72,18 @@ GRANT SELECT ON elktest.* TO `elkt`@`localhost` identified by 'elkt';
 FLUSH PRIVILEGES;
 ```
 
+
+
+## 크롤링용 db 테이블 생성
+
+```mariadb
+DROP TABLE news;
+CREATE TABLE news(
+	news_id int,
+    title VARCHAR(100),
+    url VARCHAR(500),
+	category VARCHAR(30),
+    currdate DATE
+);
+```
+
