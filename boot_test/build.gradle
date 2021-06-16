@@ -1,42 +1,31 @@
 plugins {
-    id 'org.springframework.boot' version '2.4.5'
+    id 'org.springframework.boot' version '2.4.6'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'war'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile('org.springframework.boot:spring-boot-starter-web')
-    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
-    compile('org.springframework.boot:spring-boot-starter-data-jpa')
-    runtime('org.springframework.boot:spring-boot-devtools')
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-
-
-
-//    implementation 'org.springframework.boot:spring-boot-starter-web'
-//    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    // jstl
-    // https://mvnrepository.com/artifact/javax.servlet/jstl
-    implementation group: 'javax.servlet', name: 'jstl', version: '1.2'
-
-
-    // es
-    // https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch
-    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.12.1'
-    // https://mvnrepository.com/artifact/org.elasticsearch.client/elasticsearch-rest-high-level-client
-    implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client', version: '7.12.1'
-    // https://mvnrepository.com/artifact/org.elasticsearch.client/transport
-    implementation group: 'org.elasticsearch.client', name: 'transport', version: '7.12.1'
-
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.projectlombok:lombok'
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 test {
