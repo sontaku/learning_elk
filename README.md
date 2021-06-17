@@ -14,7 +14,7 @@
   
   *https://mvnrepository.com/artifact/org.elasticsearch.client/elasticsearch-rest-high-level-client/7.12.1*
   
-- spring-boot : 2.4.5
+- spring-boot : 2.4.6
 
 - gradle : 6.3
 
@@ -59,7 +59,7 @@ https://www.elastic.co/kr/downloads/past-releases/elasticsearch-7-12-1
    
 3. 기존 설정으로 웹 화면 구동 확인 ( 9200 port 바인딩 확인 )
 
-   ![\image\es_server_text.png](\image\es_server_test.png)
+   ![/image/es_server_text.png](/image/es_server_test.png)
 
    
 
@@ -81,7 +81,7 @@ https://www.elastic.co/kr/downloads/past-releases/elasticsearch-7-12-1
 
    4. bat 배치파일 재실행 후 접속 확인
 
-      ![\image\es_server_test_local_ip.png](\image\es_server_test_local_ip.png)
+      ![/image/es_server_test_local_ip.png](/image/es_server_test_local_ip.png)
 
    
 
@@ -103,7 +103,13 @@ https://www.elastic.co/kr/downloads/past-releases/logstash-7-12-1
 
 ### 테스트
 
-1. 설정파일 변경
+1. jdbc파일 설치
+
+   https://downloads.mariadb.org/connector-java/3.0.0/
+
+   logstash-7.12.1/lib 밑에 설치
+
+2. 설정파일 변경
 
    config/logstash-sample.conf 참조
 
@@ -140,13 +146,46 @@ https://www.elastic.co/kr/downloads/past-releases/logstash-7-12-1
    }
    ```
 
-2. 실행
+3. logstash-7.12.1/bin 경로에서 실행
 
    ```
    logstash -f "../config/temp.conf"
    ```
 
+   테스트 환경에서 player 테이블 참조로 아래와 같이 설정 후 실행
+
+   ``````
+   # Sample Logstash configuration for creating a simple
+   # Beats -> Logstash -> Elasticsearch pipeline.
    
+   input {
+     beats {
+       port => 5044
+     }
+     jdbc {
+        jdbc_validate_connection => true
+        jdbc_driver_class => "com.mysql.jdbc.Driver"
+        jdbc_driver_library => "로컬경로/jdbc.jar" 파일
+        jdbc_connection_string => "jdbc:mariadb://earlykross.cuopsz9nr7wp.ap-northeast-2.rds.amazonaws.com:3306/earlykross"
+        jdbc_user => "ek"
+        jdbc_password => "siattiger"
+        statement => "SELECT * FROM player"
+        schedule => "*/1 * * * *"
+        }
+   }
+   
+   output {
+     elasticsearch {
+       hosts => ["http://localhost:9200"]
+       index => "player"
+       #index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+       #user => "elastic"
+       #password => "changeme"
+     }
+   }
+   ``````
+
+   ``` logstash -f "../config/player.conf"```
 
 
 
