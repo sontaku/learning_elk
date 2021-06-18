@@ -41,7 +41,7 @@ https://www.elastic.co/kr/support/matrix#matrix_jvm
 
 ### 설치
 
-gradle dependency를 주입하거나 아래 경로에서 내려받는다.(.zip)
+아래 경로에서 내려받는다.(.zip)
 
 https://www.elastic.co/kr/downloads/past-releases/elasticsearch-7-12-1
 
@@ -51,7 +51,7 @@ https://www.elastic.co/kr/downloads/past-releases/elasticsearch-7-12-1
 
 1. elasticsearch-7.12.1/bin/elasticsearch.bat 배치파일 실행
 
-2. ~~터미널에서 elasticsearch 서버 값 체크~~
+2. 터미널에서 elasticsearch 서버 값 체크
 
    ```
    curl http://localhost:9200
@@ -73,7 +73,7 @@ https://www.elastic.co/kr/downloads/past-releases/elasticsearch-7-12-1
 
    2. Network 영역에 
 
-      ```network.host: 0.0.0.0``` 추가
+      ```network.host: 0.0.0.0``` 추가 (_따옴표 없음!_)
 
    3. Discovery 영역
 
@@ -101,15 +101,33 @@ https://www.elastic.co/kr/downloads/past-releases/logstash-7-12-1
 
 1. jdbc파일 설치
 
-   https://downloads.mariadb.org/connector-java/3.0.0/
+   https://downloads.mysql.com/archives/c-j/
 
-   logstash-7.12.1/lib 밑에 설치
+   ```/usr/local/etc/logstash/tools```  밑에 설치 
+
+   tools는 새로 추가한 디렉토리이며, 이름은 중요치 않음
+
+   
 
 2. 설정파일 변경
 
+   테스트 환경에서 사용할 임시테이블 news
+
+   ```mariadb
+   CREATE TABLE news(
+   	news_id int,
+       title VARCHAR(100),
+       url VARCHAR(500),
+   	category VARCHAR(30),
+       currdate DATE
+   );
+   ```
+
+   
+
    config/logstash-sample.conf 참조
 
-   위 파일 복사하여 news.conf 생성
+   위 파일 참조하여 news 테이블 값을 불러 올 news.conf 생성
 
    ```
    input {
@@ -133,7 +151,23 @@ https://www.elastic.co/kr/downloads/past-releases/logstash-7-12-1
      }
    }
    ```
+
+   jdbc_connection_string : 데이터를 가져올 데이터베이스 주소 및 이름
+
+   jdbc_user : DB user명
+
+   jdbc_password : DB p/w
+
+   statement : 해당 DB에 전송할 쿼리
+
+   .
+
+   .
+
+   index : 설정파일의 index 값이 됨
+
    
+
 3. logstash-7.12.1/bin 경로에서 실행
 
    ```
@@ -143,9 +177,9 @@ https://www.elastic.co/kr/downloads/past-releases/logstash-7-12-1
    
 
    테스트 환경에서는 aws rds db데이터를 참조한다.
-   
+
    player 테이블 참조로 아래와 같이 설정 후 실행
-   
+
    ``````
    input {
      jdbc {
@@ -168,7 +202,7 @@ https://www.elastic.co/kr/downloads/past-releases/logstash-7-12-1
      }
    }
    ``````
-   
+
    ``` logstash -f "../config/player.conf"```
 
 
