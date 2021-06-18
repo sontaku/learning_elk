@@ -87,10 +87,6 @@ https://www.elastic.co/kr/downloads/past-releases/elasticsearch-7-12-1
 
 
 
-
-
-
-
 ## 2. logstash
 
 ### 설치
@@ -113,81 +109,116 @@ https://www.elastic.co/kr/downloads/past-releases/logstash-7-12-1
 
    config/logstash-sample.conf 참조
 
-   위 파일 복사하여 temp.conf 생성
+   위 파일 복사하여 news.conf 생성
 
    ```
-   # Sample Logstash configuration for creating a simple
-   # Beats -> Logstash -> Elasticsearch pipeline.
-   
    input {
-     beats {
-       port => 5044
-     }
      jdbc {
-        jdbc_validate_connection => true
-        jdbc_driver_class => "com.mysql.cj.jdbc.Driver"
-        jdbc_driver_library => "C:/00.siat/00.sw/00.lib/elk/logstash-7.12.1/lib/mysql-connector-java-8.0.25.jar"
-        jdbc_connection_string => "jdbc:mariadb://earlykross.cuopsz9nr7wp.ap-northeast-2.rds.amazonaws.com:3306/earlykross"
-        jdbc_user => "ek"
-        jdbc_password => "siattiger"
-        statement => "SELECT * FROM member"
-        schedule => "*/1 * * * *"
+        jdbc_driver_library => "/usr/local/etc/logstash/tools/mysql-connector-java-5.1.38-bin.jar"
+        jdbc_driver_class => "com.mysql.jdbc.Driver"
+        jdbc_connection_string => "jdbc:mysql://localhost:3306/elktest"
+        jdbc_user => "elkt"
+        jdbc_password => "elkt"
+        statement => "SELECT * FROM news"
         }
    }
    
    output {
      elasticsearch {
        hosts => ["http://localhost:9200"]
-       index => "member"
+       index => "newstest"
        #index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
        #user => "elastic"
        #password => "changeme"
      }
    }
    ```
-
+   
 3. logstash-7.12.1/bin 경로에서 실행
 
    ```
    logstash -f "../config/temp.conf"
    ```
 
-   테스트 환경에서 player 테이블 참조로 아래와 같이 설정 후 실행
-
-   ``````
-   # Sample Logstash configuration for creating a simple
-   # Beats -> Logstash -> Elasticsearch pipeline.
    
+
+   테스트 환경에서는 aws rds db데이터를 참조한다.
+   
+   player 테이블 참조로 아래와 같이 설정 후 실행
+   
+   ``````
    input {
-     beats {
-       port => 5044
-     }
      jdbc {
-        jdbc_validate_connection => true
+        jdbc_driver_library => "/usr/local/etc/logstash/tools/mysql-connector-java-5.1.38-bin.jar"
         jdbc_driver_class => "com.mysql.jdbc.Driver"
-        jdbc_driver_library => "로컬경로/jdbc.jar" 파일
-        jdbc_connection_string => "jdbc:mariadb://earlykross.cuopsz9nr7wp.ap-northeast-2.rds.amazonaws.com:3306/earlykross"
+        jdbc_connection_string => "jdbc:mysql://earlykross.cuopsz9nr7wp.ap-northeast-2.rds.amazonaws.com:3306/earlykross"
         jdbc_user => "ek"
         jdbc_password => "siattiger"
         statement => "SELECT * FROM player"
-        schedule => "*/1 * * * *"
         }
    }
    
    output {
      elasticsearch {
        hosts => ["http://localhost:9200"]
-       index => "player"
+       index => "iplayer"
        #index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
        #user => "elastic"
        #password => "changeme"
      }
    }
    ``````
-
+   
    ``` logstash -f "../config/player.conf"```
 
 
 
 ## 3. kibana
 
+### 설치
+
+elasticsearch와 동일한 버전으로 설치(.zip)
+
+https://www.elastic.co/kr/downloads/past-releases/kibana-7-12-1
+
+
+
+kibana.yml 설정 파일의 경우 노터치! 
+
+
+
+kibana의 경우 5601번의 포트 값을 통해 실행한다.
+
+위의 elastic search - logstash를 차례로 실행시킨 후
+
+결과 값을 https://localhost:5601 에서 확인 가능하다.
+
+
+
+![/image/kb_data.png](/image/kb_data.png)
+
+
+
+<hr>
+
+## 구현 중 ELK 에러상황
+
+### 1. Logstash 설정파일(*.conf) 작성시 주의사항
+
+- DB명, USER명, PW가 연결된 경로에 존재하는지 확인
+- statement 쿼리 작성시 테이블명, 쿼리이름은 소문자로 작성
+- Key => "Value" 구조 따옴표 주의
+
+
+
+### 2. LINUX 환경에서 구동시
+
+이미 동작하는 es 서버가 있을 시, 기존 동작하는 서버를 유지한채 새로 접속한 서버는 접속실패하므로 확인 요구됨
+
+es접속확인 : ``` ps -ef | grep elasticsearch```
+
+종료 : ```kill port번호```
+
+
+
+### 3. ELK 간 버전 통일 필수
